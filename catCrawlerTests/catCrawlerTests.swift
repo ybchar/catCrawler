@@ -33,7 +33,7 @@ class catCrawlerTests: XCTestCase {
         service.getCats(page: 0 , limit: 0){
             result in
             switch result {
-            case .failure(let error):
+             case .failure(let error):
                 expectaion.fulfill()
             case .success(let response):
                 print(response)

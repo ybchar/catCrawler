@@ -7,7 +7,7 @@
 
 import UIKit
 
-class ViewController: UIViewController {
+class ViewController: UIViewController, CatViewModelOutput {
 
     private enum  Metrics {
         static let inset: CGFloat = 4
@@ -22,6 +22,8 @@ class ViewController: UIViewController {
         layout.minimumInteritemSpacing = Metrics.inset
         return cv
     }()
+    
+    private let viewModel = CatViewModel()
     
     override func viewDidLoad() {
         
@@ -55,6 +57,18 @@ class ViewController: UIViewController {
         self.collectionView.dataSource = self
         
         self.collectionView.reloadData()
+        // view model self delegate
+        self.viewModel.delegate = self
+        // view model load
+        self.viewModel.load()
+    }
+    
+    func loadComplete(){
+        DispatchQueue.main.async {
+            // 현재 url request로 했기 때문에 메인 스레드에 담는 작업을 해야함
+            self.collectionView.reloadData()
+        }
+        
     }
 }
 
@@ -72,7 +86,7 @@ extension ViewController : UICollectionViewDelegateFlowLayout{
 extension ViewController : UICollectionViewDataSource{
     
     func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
-        return 6
+        return self.viewModel.data.count
     }
     
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {

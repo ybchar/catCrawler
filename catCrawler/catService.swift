@@ -7,6 +7,14 @@
 
 import Foundation
 
+// codable로 json 파싱
+struct CatResponse : Codable{
+    let id: String;
+    let url: String;
+    let width: Int;
+    let height: Int;
+}
+
 final class CatService{
     
     enum RequestError: Error{
@@ -16,7 +24,7 @@ final class CatService{
     func getCats(
         page: Int,
         limit: Int,
-        completion: @escaping (Result<String, RequestError>) -> Void
+        completion: @escaping (Result<[CatResponse]  , RequestError>) -> Void
     ){
         
         var components = URLComponents(string: "https://api.thecatapi.com/v1/images/search")!
@@ -42,9 +50,13 @@ final class CatService{
                 return
             }
             
-            guard let response = String(data: data, encoding: .utf8) else{                  completion(.failure(.networkError))
-                return
-            }
+            guard let response = try?
+                    JSONDecoder().decode([CatResponse].self, from: data) else {
+                    completion(.failure(.networkError))
+                    return
+                }
+
+            
             print(response)
             
             completion(.success(response))
