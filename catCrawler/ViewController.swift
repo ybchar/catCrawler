@@ -91,6 +91,9 @@ extension ViewController : UICollectionViewDataSource{
     
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
         let cell = collectionView.dequeueReusableCell(withReuseIdentifier: "Cell", for: indexPath) as! CatCell;
+        
+        let data = self.viewModel.data[indexPath.item]
+        cell.setupData(urlString: data.url)
         return cell
     }
     

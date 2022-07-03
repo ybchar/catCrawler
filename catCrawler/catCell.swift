@@ -13,6 +13,10 @@ final class CatCell: UICollectionViewCell{
     
     private let imageView = UIImageView()
     
+    private let service = ImageService.shared
+    
+    private var task: URLSessionDataTask?
+    
     override init(frame: CGRect) {
         super.init(frame: frame)
         self.setupView()
@@ -37,6 +41,17 @@ final class CatCell: UICollectionViewCell{
             
         ])
         self.imageView.backgroundColor = .cyan
+        self.imageView.clipsToBounds = true
         self.imageView.contentMode = .scaleAspectFill
+    }
+    
+    func setupData (urlString: String, detail: Bool = false){
+        task?.cancel()
+        service.setImage(view: self.imageView, urlString: urlString)
+        if detail {
+            self.imageView.contentMode = .scaleAspectFit
+        }
+//        task = service.setImage(view: self.imageView, urlString: urlString)
+        
     }
 }
