@@ -10,16 +10,19 @@ import UIKit
 class ViewController: UIViewController, CatViewModelOutput {
 
     private enum  Metrics {
-        static let inset: CGFloat = 4
+        static let inset: CGFloat = 2
     }
     
     private let collectionView: UICollectionView = {
         let layout = UICollectionViewFlowLayout()
         let cv = UICollectionView(frame: .zero, collectionViewLayout: layout)
+        
         // 초기 백그라운드 컬러 지정
         cv.backgroundColor = .white
+        
         layout.minimumLineSpacing = Metrics.inset
         layout.minimumInteritemSpacing = Metrics.inset
+        
         return cv
     }()
     
