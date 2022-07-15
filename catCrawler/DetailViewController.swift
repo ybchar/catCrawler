@@ -1,5 +1,5 @@
 //
-//  ViewController.swift
+//  DetailViewController.swift
 //  catCrawler
 //
 //  Created by 차윤범 on 2022/06/05.
@@ -7,11 +7,8 @@
 
 import UIKit
 
-class ViewController: UIViewController, CatViewModelOutput {
+class DetailViewController: UIViewController, CatViewModelOutput {
 
-    private enum  Metrics {
-        static let inset: CGFloat = 2
-    }
     
     private let collectionView: UICollectionView = {
         let layout = UICollectionViewFlowLayout()
@@ -20,13 +17,27 @@ class ViewController: UIViewController, CatViewModelOutput {
         // 초기 백그라운드 컬러 지정
         cv.backgroundColor = .white
         
-        layout.minimumLineSpacing = Metrics.inset
-        layout.minimumInteritemSpacing = Metrics.inset
+        layout.minimumLineSpacing = .zero
+        layout.minimumInteritemSpacing =  .zero
+        layout.scrollDirection = .horizontal
+        cv.isPagingEnabled = true
         
         return cv
     }()
     
-    private let viewModel = CatViewModel()
+    private let viewModel : CatViewModel
+    
+    private let index: Int
+    
+    init(viewModel: CatViewModel, index: Int){
+        self.viewModel = viewModel
+        self.index = index
+        super.init(nibName: nil, bundle: nil )
+    }
+    
+    required init?(coder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
+    }
     
     override func viewDidLoad() {
         
@@ -38,7 +49,7 @@ class ViewController: UIViewController, CatViewModelOutput {
     private func setupView(){
         self.view.addSubview(self.collectionView)
         
-        //
+        
         self.collectionView.translatesAutoresizingMaskIntoConstraints = false
 
         NSLayoutConstraint.activate([
@@ -61,10 +72,16 @@ class ViewController: UIViewController, CatViewModelOutput {
         
         self.collectionView.reloadData()
         // view model self delegate
-        self.viewModel.attach(delecate: self)
         //self.viewModel.delegate = self
+        self.viewModel.attach(delecate: self)
         // view model load
         self.viewModel.load()
+        
+        
+        // collectionView에 layout을 잡아주고
+        self.collectionView.layoutIfNeeded()
+        // collectionView에 scrollToItem으로 현재 index를 가져오고 scrollOption은 centeredHorizontally, .
+        self.collectionView.scrollToItem(at: IndexPath(item: self.index, section: 0), at: .centeredHorizontally, animated: false)
     }
     
     func loadComplete(){
@@ -72,33 +89,30 @@ class ViewController: UIViewController, CatViewModelOutput {
             // 현재 url request로 했기 때문에 메인 스레드에 담는 작업을 해야함
             self.collectionView.reloadData()
         }
-        
+    }
+    
+    // 뷰가 사라지기 직전에 delegate 해제되야 메모리가 해제됨
+    override func viewDidDisappear(_ animated: Bool) {
+        self.viewDidDisappear(animated)
+        self.viewModel.detach(delegate: self)
     }
 }
 
-extension ViewController : UICollectionViewDelegateFlowLayout{
-    func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout,sizeForItemAt indexPath: IndexPath) ->CGSize {
-        let width = collectionView.frame.width
-        
-        let cellWidth = (width - 2 * Metrics.inset) / 3
-        
-        return CGSize(width: cellWidth, height: cellWidth)
-        
-    }
+extension DetailViewController : UICollectionViewDelegateFlowLayout{
     
     // 스크롤하면 새로운 이미지가 로드되어 덧붙이는 메소드 : willDisplay
-    func collectionView(_ collectionView: UICollectionView, willDisplay cell: UICollectionViewCell, forItemAt indexPath: IndexPath) {
-        self.viewModel.loadMoreIfNeeded(index: indexPath.item)
-    }
-    
-    func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
-        let detailViewController = DetailViewController(viewModel: self.viewModel, index: indexPath.item)
-        self.present(detailViewController, animated: true, completion: nil)
-    }
+    func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, sizeForItemAt indexPath: IndexPath) -> CGSize {
+            return collectionView.frame.size
+        }
+        
+        
+        func collectionView(_ collectionView: UICollectionView, willDisplay cell: UICollectionViewCell, forItemAt indexPath: IndexPath) {
+            self.viewModel.loadMoreIfNeeded(index: indexPath.item)
+        }
 }
 
 
-extension ViewController : UICollectionViewDataSource {
+extension DetailViewController : UICollectionViewDataSource {
     
     func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
         return self.viewModel.data.count
@@ -107,8 +121,9 @@ extension ViewController : UICollectionViewDataSource {
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
         let cell = collectionView.dequeueReusableCell(withReuseIdentifier: "Cell", for: indexPath) as! CatCell;
         
+        
         let data = self.viewModel.data[indexPath.item]
-        cell.setupData(urlString: data.url)
+        cell.setupData(urlString: data.url, detail: true )
         return cell
     }
     

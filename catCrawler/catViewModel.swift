@@ -21,15 +21,26 @@ final class CatViewModel{
     private var currentPage = 0;
     
     // 한번에 21장을 가져온다는 limit
-    private var limit = 3*10;
+    private var limit = 3*7;
     
     // 만든 서비스와 연결
     private let service = CatService()
     
     // 공간을 담을 데이터
     var data: [CatResponse] = [];
+   
+    private var delegates : [CatViewModelOutput] = []
     
-    weak var delegate: CatViewModelOutput?
+    func attach(delecate: CatViewModelOutput){
+        self.delegates.append(delecate)
+    }
+    
+    func detach(delegate: CatViewModelOutput){
+        self.delegates = self.delegates.filter{
+            $0 !== delegate
+            
+        }
+    }
     
     var isLoding : Bool = false;
     
@@ -56,7 +67,10 @@ final class CatViewModel{
                 case.success(let response):
                     self.data.append(contentsOf: response)
                     self.currentPage += 1
-                    self.delegate?.loadComplete()
+                    self.delegates.forEach{
+                        $0.loadComplete()
+                    }
+                    //self.delegate?.loadComplete()
                 }
                 
                 self.isLoding = false

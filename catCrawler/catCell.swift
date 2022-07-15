@@ -41,7 +41,10 @@ final class CatCell: UICollectionViewCell{
             
         ])
         //self.imageView.backgroundColor = .darkGray
+        
+        // 이미지를 꽉 채워주는 효과
         self.imageView.contentMode = .scaleAspectFill
+        
         self.imageView.clipsToBounds = true
         
     }
@@ -50,11 +53,12 @@ final class CatCell: UICollectionViewCell{
         // 이전에 받아온 task가 있다면 cancel
         task?.cancel()
         self.imageView.image = nil
-        task = service.setImage(view: self.imageView, urlString: urlString)
-//        if detail {
-//            self.imageView.contentMode = .scaleAspectFit
-//        }
-//        task = service.setImage(view: self.imageView, urlString: urlString)
+        
+        // detail true 이면 scaleAspectFit으로 
+        if detail {
+            self.imageView.contentMode = .scaleAspectFit
+        }
+        task = service.setImage(view: self.imageView, urlString: urlString) 
         
     }
 }

@@ -28,37 +28,35 @@ final class CatService{
     ){
         
         var components = URLComponents(string: "https://api.thecatapi.com/v1/images/search")!
-        
-        
-        components.queryItems = [
-            URLQueryItem(name: "page", value: "\(page)"),
-            URLQueryItem(name: "limit", value: "\(limit)")
-        ]
+                components.queryItems = [
+                    URLQueryItem(name: "page", value: "\(page)"),
+                    URLQueryItem(name: "limit", value: "\(limit)")
+                ]
         
         var request = URLRequest(url: components.url!)
         request.httpMethod = "GET"
-        
-        let task = URLSession.shared.dataTask(with: request){
+                
+        let task = URLSession.shared.dataTask(with: request) {
             data, response, error in
-            
-            guard error == nil else{
-                 completion(.failure(.networkError))
-                return
-            }
-            guard let data = data else{
+                    
+            guard error == nil else {
                 completion(.failure(.networkError))
                 return
             }
-            
-            guard let response = try?
-                    JSONDecoder().decode([CatResponse].self, from: data) else {
-                    completion(.failure(.networkError))
-                    return
-                }
-
-            
+                    
+            guard let data = data else {
+                completion(.failure(.networkError))
+                return
+            }
+                    
+                    
+            guard let response = try? JSONDecoder().decode([CatResponse].self, from: data) else {
+                completion(.failure(.networkError))
+                return
+            }
             print(response)
-            
+                    
+                    
             completion(.success(response))
         }
         task.resume()
