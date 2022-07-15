@@ -93,7 +93,7 @@ class DetailViewController: UIViewController, CatViewModelOutput {
     
     // 뷰가 사라지기 직전에 delegate 해제되야 메모리가 해제됨
     override func viewDidDisappear(_ animated: Bool) {
-        self.viewDidDisappear(animated)
+        super.viewDidDisappear(animated)
         self.viewModel.detach(delegate: self)
     }
 }
