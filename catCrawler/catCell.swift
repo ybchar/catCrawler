@@ -40,17 +40,20 @@ final class CatCell: UICollectionViewCell{
             self.imageView.bottomAnchor.constraint(equalTo: self.bottomAnchor)
             
         ])
-        self.imageView.backgroundColor = .cyan
-        self.imageView.clipsToBounds = true
+        //self.imageView.backgroundColor = .darkGray
         self.imageView.contentMode = .scaleAspectFill
+        self.imageView.clipsToBounds = true
+        
     }
     
     func setupData (urlString: String, detail: Bool = false){
+        // 이전에 받아온 task가 있다면 cancel
         task?.cancel()
-        service.setImage(view: self.imageView, urlString: urlString)
-        if detail {
-            self.imageView.contentMode = .scaleAspectFit
-        }
+        self.imageView.image = nil
+        task = service.setImage(view: self.imageView, urlString: urlString)
+//        if detail {
+//            self.imageView.contentMode = .scaleAspectFit
+//        }
 //        task = service.setImage(view: self.imageView, urlString: urlString)
         
     }

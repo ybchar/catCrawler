@@ -51,7 +51,7 @@ class ViewController: UIViewController, CatViewModelOutput {
             self.collectionView.bottomAnchor.constraint(equalTo: self.view.bottomAnchor)
         ])
         
-        self.collectionView.backgroundColor = .white
+        //self.collectionView.backgroundColor = .white
         
         self.collectionView.register(CatCell.self, forCellWithReuseIdentifier: "Cell")
         
@@ -84,9 +84,15 @@ extension ViewController : UICollectionViewDelegateFlowLayout{
         return CGSize(width: cellWidth, height: cellWidth)
         
     }
+    
+    // 스크롤하면 새로운 이미지가 로드되어 덧붙이는 메소드 : willDisplay
+    func collectionView(_ collectionView: UICollectionView, willDisplay cell: UICollectionViewCell, forItemAt indexPath: IndexPath) {
+        self.viewModel.loadMoreIfNeeded(index: indexPath.item)
+    }
 }
 
-extension ViewController : UICollectionViewDataSource{
+
+extension ViewController : UICollectionViewDataSource {
     
     func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
         return self.viewModel.data.count
